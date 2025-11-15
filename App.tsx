@@ -128,7 +128,7 @@ const AnalysisScreen = ({ nutritionInfo, imageUrl, onDone, onBack }: { nutrition
 };
 
 
-const HomeScreen = ({ meals, onUpload, caloriesLeft }: { meals: Meal[], onUpload: () => void, caloriesLeft: number }) => {
+const HomeScreen = ({ meals, caloriesLeft }: { meals: Meal[], caloriesLeft: number }) => {
     const calorieProgress = Math.max(0, (caloriesLeft / DAILY_GOAL) * 100);
 
     const MacroCard = ({ value, label, status, color, icon, progress }: { value: string, label: string, status: string, color: string, icon: React.ReactNode, progress: number}) => {
@@ -221,24 +221,125 @@ const HomeScreen = ({ meals, onUpload, caloriesLeft }: { meals: Meal[], onUpload
                     </div>
                 ))}
             </div>
+        </div>
+    );
+};
 
-            <footer className="fixed bottom-0 left-0 right-0 max-w-sm md:max-w-lg mx-auto bg-white/80 backdrop-blur-sm border-t border-gray-100 p-4 flex justify-around items-center rounded-t-3xl">
-                <div className="text-center">
-                    <HomeIcon active />
-                    <span className="text-xs font-bold">Home</span>
+const AnalyticsScreen = () => {
+    const [weightPeriod, setWeightPeriod] = useState('90 Days');
+    const [nutritionPeriod, setNutritionPeriod] = useState('1 Week');
+    
+    const nutritionData = {
+        days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+        dailyIntake: [
+            { protein: 600, carbs: 800, fats: 450, total: 1850 },
+            { protein: 550, carbs: 750, fats: 400, total: 1700 },
+            { protein: 700, carbs: 900, fats: 500, total: 2100 },
+            { protein: 650, carbs: 850, fats: 437, total: 1937 },
+            { protein: 720, carbs: 950, fats: 520, total: 2190 },
+            { protein: 680, carbs: 880, fats: 480, total: 2040 },
+            { protein: 600, carbs: 820, fats: 460, total: 1880 },
+        ]
+    };
+    const maxIntake = Math.max(...nutritionData.dailyIntake.map(d => d.total));
+
+    return (
+        <div className="p-4 pb-28">
+            <header className="flex justify-between items-center py-4">
+                <h1 className="text-2xl font-bold">Goal Progress</h1>
+                <p className="text-sm font-semibold">80% <span className="text-gray-400 font-normal">Goal achieved</span></p>
+            </header>
+
+            <div className="bg-white rounded-3xl shadow-sm p-6 mb-6">
+                <div className="flex space-x-2 mb-6">
+                    {['90 Days', '6 Months', '1 Year', 'All time'].map(p => (
+                        <button key={p} onClick={() => setWeightPeriod(p)} className={`px-4 py-2 text-sm font-semibold rounded-full ${weightPeriod === p ? 'bg-black text-white' : 'bg-gray-100 text-gray-600'}`}>
+                            {p}
+                        </button>
+                    ))}
                 </div>
-                 <div className="text-center text-gray-400">
-                    <AnalyticsIcon />
-                    <span className="text-xs">Analytics</span>
+                <div className="relative h-40">
+                    <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-xs text-gray-400">
+                        <span>60Kg</span><span>65Kg</span><span>70Kg</span><span>80Kg</span>
+                    </div>
+                    <div className="absolute left-10 right-0 top-0 bottom-8">
+                         <div className="h-full border-l border-gray-200">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="h-1/4 border-b border-dashed border-gray-200 last:border-none"></div>
+                            ))}
+                        </div>
+                        <div className="absolute top-[calc(37.5%)] left-0 right-0 h-px bg-gray-300">
+                            <div className="absolute left-[70%] -top-3.5 bg-black text-white text-xs font-bold px-2 py-1 rounded-full">
+                                67Kg
+                            </div>
+                        </div>
+                    </div>
+                    <div className="absolute left-10 right-0 bottom-0 h-8 flex justify-between text-xs text-gray-400">
+                        {[1, 7, 14, 21, 28, 31].map(day => <span key={day}>{day}</span>)}
+                    </div>
                 </div>
-                 <div className="text-center text-gray-400">
-                    <SettingsIcon />
-                    <span className="text-xs">Settings</span>
+            </div>
+
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Nutritions</h2>
+                <p className="text-sm text-green-500 font-semibold">90% <span className="text-gray-400 font-normal">This week vs last week</span></p>
+            </div>
+            
+            <div className="bg-white rounded-3xl shadow-sm p-6 mb-6 relative overflow-hidden">
+                <div className="flex space-x-2 mb-6">
+                    {['1 Week', '2 Week', '3 Week', '1 Month'].map(p => (
+                        <button key={p} onClick={() => setNutritionPeriod(p)} className={`px-4 py-2 text-sm font-semibold rounded-full ${nutritionPeriod === p ? 'bg-black text-white' : 'bg-gray-100 text-gray-600'}`}>
+                            {p}
+                        </button>
+                    ))}
                 </div>
-                <button onClick={onUpload} className="absolute -top-7 right-6 bg-black rounded-full p-4 shadow-lg shadow-gray-400">
-                    <PlusIcon />
-                </button>
-            </footer>
+                <div className="flex justify-between items-baseline mb-4">
+                    <div>
+                        <p className="text-3xl font-bold">12780</p>
+                        <p className="text-sm text-gray-500">Total calories</p>
+                    </div>
+                     <div>
+                        <p className="text-3xl font-bold">1952</p>
+                        <p className="text-sm text-gray-500">Daily avg.</p>
+                    </div>
+                </div>
+                <div className="h-48 flex items-end justify-between space-x-2 relative">
+                    {/* Floating macro labels */}
+                     <span className="absolute top-8 left-[-10px] bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold transform -rotate-15">Protein</span>
+                     <span className="absolute top-2 right-[20%] bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold">Carbs</span>
+                     <span className="absolute top-1/2 right-[-20px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold transform rotate-15">Fats</span>
+
+                    <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-xs text-gray-400">
+                       <span>2k</span><span>1k</span><span>500</span><span>0</span>
+                    </div>
+
+                    <div className="w-full h-full flex items-end justify-between ml-8">
+                        {nutritionData.dailyIntake.map((day, index) => {
+                            const totalHeight = (day.total / maxIntake) * 100;
+                            const proteinHeight = (day.protein / day.total) * 100;
+                            const carbsHeight = (day.carbs / day.total) * 100;
+                            return (
+                                <div key={index} className="flex-1 flex flex-col items-center">
+                                    {index === 3 && (
+                                        <div className="relative mb-1">
+                                            <div className="bg-black text-white text-xs px-2 py-1 rounded-md">
+                                                1937
+                                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-black transform rotate-45"></div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="w-4 rounded-t-md" style={{ height: `${totalHeight}%`}}>
+                                        <div className="bg-red-400 h-full rounded-t-md" style={{ height: `${proteinHeight}%` }}></div>
+                                        <div className="bg-orange-400 h-full" style={{ height: `${carbsHeight}%` }}></div>
+                                        <div className="bg-blue-400 h-full"></div>
+                                    </div>
+                                    <span className="text-xs text-gray-500 mt-2">{nutritionData.days[index]}</span>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
@@ -255,9 +356,30 @@ const LoadingScreen = () => (
     </div>
 );
 
+const BottomNav = ({ activeTab, onTabChange, onUpload }) => (
+    <footer className="fixed bottom-0 left-0 right-0 max-w-sm md:max-w-lg mx-auto bg-white/80 backdrop-blur-sm border-t border-gray-100 p-4 flex justify-around items-center rounded-t-3xl z-20">
+        <button onClick={() => onTabChange('home')} className="text-center">
+            <HomeIcon active={activeTab === 'home'} />
+            <span className={`text-xs ${activeTab === 'home' ? 'font-bold text-black' : 'text-gray-400'}`}>Home</span>
+        </button>
+         <button onClick={() => onTabChange('analytics')} className="text-center">
+            <AnalyticsIcon active={activeTab === 'analytics'} />
+            <span className={`text-xs ${activeTab === 'analytics' ? 'font-bold text-black' : 'text-gray-400'}`}>Analytics</span>
+        </button>
+         <button onClick={() => onTabChange('settings')} className="text-center text-gray-400">
+            <SettingsIcon active={activeTab === 'settings'}/>
+            <span className="text-xs">Settings</span>
+        </button>
+        <button onClick={onUpload} className="absolute -top-7 right-6 bg-black rounded-full p-4 shadow-lg shadow-gray-400">
+            <PlusIcon />
+        </button>
+    </footer>
+);
+
 
 const App: React.FC = () => {
   const [view, setView] = useState<'home' | 'analyzing' | 'results'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'analytics' | 'settings'>('home');
   const [meals, setMeals] = useState<Meal[]>(mockMeals);
   const [analyzedData, setAnalyzedData] = useState<{ nutritionInfo: NutritionInfo, imageUrl: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -317,7 +439,9 @@ const App: React.FC = () => {
 
   return (
     <div className="w-full max-w-sm md:max-w-lg mx-auto bg-gray-50 font-sans min-h-screen relative">
-        <HomeScreen meals={meals} onUpload={triggerFileSelect} caloriesLeft={caloriesLeft} />
+        {activeTab === 'home' && <HomeScreen meals={meals} caloriesLeft={caloriesLeft} />}
+        {activeTab === 'analytics' && <AnalyticsScreen />}
+        
         {view === 'analyzing' && <LoadingScreen />}
         {error && <p className="text-red-500 p-4">{error}</p>}
         
@@ -325,10 +449,13 @@ const App: React.FC = () => {
           type="file"
           accept="image/*"
           capture="environment"
+          // Fix: Corrected the ref assignment. It should be `fileInputRef` not `fileInput.current`.
           ref={fileInputRef}
           onChange={handleImageChange}
           className="hidden"
         />
+
+        <BottomNav activeTab={activeTab} onTabChange={setActiveTab} onUpload={triggerFileSelect} />
     </div>
   );
 };

@@ -1,17 +1,11 @@
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { NutritionInfo } from "../types";
 
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  // A check to ensure the API key is available.
-  // In a real-world scenario, you might have more robust error handling
-  // or a UI prompt if the key is missing.
-  console.warn("Gemini API key is not set. Please set the API_KEY environment variable.");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+// Fix: Initialize GoogleGenAI directly with process.env.API_KEY as per guidelines.
+// The API key's availability is a hard requirement and handled externally.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const nutritionSchema = {
   type: Type.OBJECT,
@@ -48,10 +42,7 @@ function fileToGenerativePart(file: File): Promise<{ inlineData: { data: string;
 
 
 export async function analyzeImageForNutrition(imageFile: File): Promise<NutritionInfo> {
-    if (!API_KEY) {
-        throw new Error("API key is not configured.");
-    }
-    
+    // Fix: Removed check for API_KEY as its availability is assumed per guidelines.
     const imagePart = await fileToGenerativePart(imageFile);
 
     try {
