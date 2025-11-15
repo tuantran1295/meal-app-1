@@ -1,0 +1,7 @@
+{
+  "name": "Nutrition Analyzer",
+  "description": "A mobile app that allows users to take a picture of their meal, and the app calculates calories, carbs, protein, fats, and a health score. It helps users track their nutrition for body weight control and provides AI-powered advice.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
